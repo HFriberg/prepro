@@ -985,12 +985,14 @@ CBFresponsee CBFdyn_map_adddomain(CBFdyndata *dyndata, CBFscalarconee domain, lo
   // Always try to skip the creation of a new domains
   if ((dyndata->data->mapstacknum == 0) || (domain != dyndata->data->mapstackdomain[dyndata->data->mapstacknum - 1])
       || (domain != CBF_CONE_FREE && domain != CBF_CONE_POS && domain != CBF_CONE_NEG && domain != CBF_CONE_ZERO)) {
+        
     // Create new domain
     ++dyndata->data->mapstacknum;
     dyndata->data->mapstackdim[dyndata->data->mapstacknum - 1] = 0;
     dyndata->data->mapstackdomain[dyndata->data->mapstacknum - 1] = domain;
 
   }
+  
   // Increase dimension of current domain
   dyndata->data->mapstackdim[dyndata->data->mapstacknum - 1] += dim;
   dyndata->data->mapnum += dim;
@@ -1450,6 +1452,7 @@ CBFresponsee CBFdyn_varbound_capacitysurplus(CBFdyndata *dyndata, long long int 
 CBFresponsee CBFdyn_varbound_addlower(CBFdyndata *dyndata, long long int idx, double lower) {
   // x[i] - lower >= 0
   CBFresponsee res = CBF_RES_OK;
+  
   res = CBFdyn_map_adddomain(dyndata, CBF_CONE_POS, 1);
 
   if (res == CBF_RES_OK)
