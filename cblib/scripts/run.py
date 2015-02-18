@@ -37,48 +37,68 @@ import os, sys, inspect, getopt, time
 import filter
 from timeit import Timer
 from summary import summary
+from data.CBFrunstat import CBFrunstat
 from data.CBFdata import CBFdata
 from data.CBFset import CBFset
 
-def run(solver, probfile, solfile, paramfile, printer):
+def run(solver, probfile, solfile, paramfile, printer, callback):
 
   ss = None
   try:
     timebefore = time.time()
     for (i,pp) in enumerate(CBFdata(probfile).iterator()):
-      print('Read in: %.2f seconds' % (time.time() - timebefore))
+      if printer:
+        printer('File read: %.2f seconds' % (time.time() - timebefore))
 
       timebefore = time.time()
       solver.read(probfile, paramfile, pp)
-      print('Moved to solver in: %.2f seconds' % (time.time() - timebefore))
+      if printer:
+        printer('Solver read: %.2f seconds' % (time.time() - timebefore))
 
       pptime = Timer(solver.optimize).timeit(number=1)
-      ppsol = solver.getsolution()
+      if printer:
+        solver.report()
 
       # Write to file
+      ppsol = solver.getsolution()
+
       if i == 0:
         if os.path.dirname(solfile) and not os.path.exists(os.path.dirname(solfile)):
           os.makedirs(os.path.dirname(solfile))
         ss = open(solfile, 'w')
       else:
         ss.write('CHANGE\n\n')
+
       ppsol.printsol( lambda x: ss.write(str(x) + '\n') )
 
       # Write to printer
-      printer('\n' + pp.name + '[' + str(i) + ']: ' + str(pptime) + 's ' + solfile)
-      summary(pp, ppsol, printer)
+      if printer:
+        printer('\n' + pp.name + '[' + str(i) + ']: ' + str(pptime) + 's ' + solfile)
+        summary(pp, ppsol, printer)
+
+      if callback:
+        callback(CBFrunstat(pp, i, solver, ppsol, pptime))
+
+      timebefore = time.time()
 
   finally:
     if ss is not None:
       ss.close()
 
 
+def benchmark_callback(pack, rs):  
+  primobjstat = rs.primobjstatus()
+  if primobjstat[1]:
+    primobjstat[1] = '(' + primobjstat[1] + ')'
+  sys.stdout.write(';'.join([pack, rs.problem.name, str(rs.id), ''.join(primobjstat), '{0:.4E}'.format(rs.soltime), str(rs.solver.getsizeoftree())]) + '\n')
+  
+
 
 if __name__ == "__main__":
 
   try:
     # Verify command line arguments
-    opts, args = getopt.gnu_getopt(sys.argv[1:], "fs:p:", "filter=")
+    opts, args = getopt.gnu_getopt(sys.argv[1:], "fs:p:", ["filter=","benchmark"])
     if len(args) == 0:
       raise Exception('ERROR: No solver specified!')
   except Exception as e:
@@ -95,6 +115,7 @@ if __name__ == "__main__":
   setexpr = None
   filtexpr = None
   paramfile = None
+  benchmark = False
 
   for opt, arg in opts:
     if opt == "-f":
@@ -105,10 +126,26 @@ if __name__ == "__main__":
       filtexpr = arg
     elif opt == "-p":
       paramfile = arg
+    elif opt == "--benchmark":
+      benchmark = True
 
   try:
+    # Setup output formatting
+    if benchmark:
+      rawprinter = None
+      printer    = None
+      callback   = lambda rs: benchmark_callback(cbfset.getpack(rs.problem.file, cbfset.rootdir), rs)
+
+      # Default print: header
+      sys.stdout.write(';'.join(['PACK','NAME','ID','STATUS','TIME','TREE SIZE']) + '\n')
+      
+    else:
+      rawprinter = sys.stdout.write
+      printer    = lambda x: rawprinter(str(x) + '\n')
+      callback   = None
+      
     # Load solver
-    solver = __import__('solvers.' + sys.argv[1], fromlist=sys.argv[1]).solver(sys.stdout.write)
+    solver = __import__('solvers.' + sys.argv[1], fromlist=sys.argv[1]).solver(rawprinter)
 
     # Load problem and solution files
     if setexpr is not None:
@@ -120,19 +157,13 @@ if __name__ == "__main__":
     else:
       cbfset = filter.defaultcbfset()
 
-    probfiles = cbfset.cbffiles
-    solfiles = cbfset.solfiles
-
     # Apply filter if any
     if filtexpr:
-      probfilter = list()
-      filter.filter("", ''.join(["bool(", filtexpr, ")"]), cbfset, lambda x: probfilter.append(x))
-      probfiles = [probfiles[i] for i in range(len(probfilter)) if probfilter[i]]
-      solfiles = [solfiles[i] for i in range(len(probfilter)) if probfilter[i]]
+      cbfset.filter(filtexpr)
 
     # Start runs
-    for (probfile, solfile) in zip(probfiles, solfiles):
-      run(solver, probfile, solfile, paramfile, lambda x: sys.stdout.write(str(x)+'\n'))
+    for (probfile, solfile) in zip(cbfset.cbffiles, cbfset.solfiles):
+      run(solver, probfile, solfile, paramfile, printer, callback)
 
   except Exception as e:
     print(str(e))

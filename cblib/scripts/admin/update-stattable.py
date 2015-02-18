@@ -59,6 +59,7 @@ def update_stattable(statfile, probfiles, solfiles):
     sys.stdout.write('\n' + solfile + '\n')
     solstat = summary(probfile, solfile, lambda x: None)
     csvstat = statdict[solstat['prob'].name]
+    isminimize = (solstat['prob'].obj.strip().upper() == 'MIN')
 
     cchanged = False
     pchanged = False
@@ -74,7 +75,7 @@ def update_stattable(statfile, probfiles, solfiles):
     if 'psol' in solstat:
       psol = solstat['psol']
       perr = max(psol[1].values())
-      if worty_replacement(csvstat['perr'], csvstat['pobj'], perr, psol[0], solstat['prob'].obj=='MIN'):
+      if worty_replacement(csvstat['perr'], csvstat['pobj'], perr, psol[0], isminimize):
         pchanged = True
         csvstat['pcer'] = 'FEASIBILITY'
         csvstat['perr'] = '{0:.16g}'.format(perr)
@@ -83,7 +84,7 @@ def update_stattable(statfile, probfiles, solfiles):
     if 'pinfeascer' in solstat:
       pinfeascer = solstat['pinfeascer']
       perr = max(pinfeascer[1].values())
-      if worty_replacement(csvstat['perr'], csvstat['pobj'], perr, pinfeascer[0], solstat['prob'].obj=='MIN'):
+      if worty_replacement(csvstat['perr'], csvstat['pobj'], perr, pinfeascer[0], isminimize):
         pchanged = True        
         csvstat['pcer'] = 'INFEASIBILITY'
         csvstat['perr'] = '{0:.16g}'.format(perr)
@@ -93,7 +94,7 @@ def update_stattable(statfile, probfiles, solfiles):
       if 'dsol' in solstat:
         dsol = solstat['dsol']
         derr = max(dsol[1].values())
-        if worty_replacement(csvstat['derr'], csvstat['dobj'], derr, dsol[0], solstat['prob'].obj=='MAX'):
+        if worty_replacement(csvstat['derr'], csvstat['dobj'], derr, dsol[0], not isminimize):
           dchanged = True
           csvstat['dcer'] = 'FEASIBILITY'
           csvstat['derr'] = '{0:.16g}'.format(derr)
@@ -102,7 +103,7 @@ def update_stattable(statfile, probfiles, solfiles):
       if 'dinfeascer' in solstat:
         dinfeascer = solstat['dinfeascer']
         derr = max(dinfeascer[1].values())
-        if worty_replacement(csvstat['derr'], csvstat['dobj'], derr, dinfeascer[0], solstat['prob'].obj=='MAX'):
+        if worty_replacement(csvstat['derr'], csvstat['dobj'], derr, dinfeascer[0], not isminimize):
           dchanged = True
           csvstat['dcer'] = 'INFEASIBILITY'
           csvstat['derr'] = '{0:.16g}'.format(derr)
@@ -191,17 +192,11 @@ if __name__ == "__main__":
   else:
     cbfset = filter.defaultcbfset()
 
-  probfiles = cbfset.cbffiles
-  solfiles = cbfset.solfiles
-
   # Apply filter if any
   if filtexpr:
-    probfilter = list()
-    filter.filter("", ''.join(["bool(", filtexpr, ")"]), cbfset, lambda x: probfilter.append(x))
-    probfiles = [probfiles[i] for i in range(len(probfilter)) if probfilter[i]]
-    solfiles = [solfiles[i] for i in range(len(probfilter)) if probfilter[i]]
+    cbfset.filter(filtexpr)
 
   try:
-    update_stattable(statfile, probfiles, solfiles)
+    update_stattable(statfile, cbfset.cbffiles, cbfset.solfiles)
   except Exception as e:
     print(str(e))
