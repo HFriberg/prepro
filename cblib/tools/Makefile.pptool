@@ -56,12 +56,20 @@ OBJECTS = pptool.o \
           transform-lindep-elimination-soc.o \
           transform-probing.o
 
+ifeq ("$(wildcard ./libs/EIGEN)","")
+  $(error Please define ./libs/EIGEN according to ./libs/README)
+endif
+
+ifeq ("$(wildcard ./libs/MOSEK)","")
+  $(error Please define ./libs/MOSEK according to ./libs/README)
+endif
+
 ifneq ("$(wildcard ./libs/ZLIB)","")
-	CCOPT+=-DZLIB_SUPPORT
-	INCPATHS+=-I./libs/ZLIB
-	LIBPATHS+=-L./libs/ZLIB
-	LIBS+=-lz
-	OBJECTS+=frontend-cbf-gz.o
+  CCOPT+=-DZLIB_SUPPORT
+  INCPATHS+=-I./libs/ZLIB
+  LIBPATHS+=-L./libs/ZLIB
+  LIBS+=-lz
+  OBJECTS+=frontend-cbf-gz.o
 endif
 
 
