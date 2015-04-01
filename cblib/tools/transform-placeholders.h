@@ -23,28 +23,14 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "transform-none.h"
-#include "cbf-format.h"
-#include "cbf-helper.h"
-#include <stddef.h>
+#ifndef CBF_TRANSFORM_PLACEHOLDERS_H
+#define CBF_TRANSFORM_PLACEHOLDERS_H
 
-static CBFresponsee
-  transform(CBFdata *data, CBFtransform_param &param, bool *changeflag);
+#include "transform.h"
+#include <vector>
 
+extern CBFtransform const transform_placeholders;
 
-// -------------------------------------
-// Global variable
-// -------------------------------------
+void transform_placeholders_init(char* integerarray__, std::vector<bool>* stronglb__, std::vector<bool>* strongub__);
 
-CBFtransform const transform_none = { "none", transform };
-
-// -------------------------------------
-// Function definitions
-// -------------------------------------
-
-static CBFresponsee transform(CBFdata *data, CBFtransform_param &param, bool *changeflag)
-{
-  // Sort coordinates row major style
-  return CBF_coordinatesort_rowmajor_map(data);
-}
-
+#endif

@@ -81,8 +81,19 @@ CBF_findbackward_psdmap(const CBFdata *data, long long int psdmap, long long int
 
 /*
  * Helps you allocate, initialize and free a 0-1 array
- * indicating whether a 'var' index belongs to 'intvar'.
+ * indicating:
+ *  (a) whether a 'map' index can be deleted.
+ *  (b) whether a 'var' index belongs to 'intvar'.
  */
+CBFresponsee
+CBFmapmaxviol_init(long long int mapnum, double **mapmaxviol);
+
+CBFresponsee 
+CBFmapmaxviol_reset(long long int mapnum, double *mapmaxviol);
+
+void
+CBFmapmaxviol_free(double **mapmaxviol);
+
 CBFresponsee
 CBFintegerarray_init(CBFdata *data, char **integertable);
 
@@ -93,11 +104,26 @@ CBFintegerarray_free(char **integertable);
 /*
  * Helps you delete maps/psdmaps and get rid of empty nnz
  */
+CBFresponsee 
+CBF_compress_obj(CBFdata *data);
+ 
 CBFresponsee
-CBF_compress_maps(CBFdata *data, const char *delmap);
+CBF_compress_maps(CBFdata *data, double *mapmaxviol);
 
 CBFresponsee
-CBF_compress_psdmaps(CBFdata *data, const char *delpsdmap);
+CBF_compress_psdmaps(CBFdata *data, double *psdmapmaxviol);
+
+
+/*
+ * Helps you get rid of all coefficients of fixed variables, by
+ * evaluating the their contribution to each constraint from 
+ * non-nan values of fixvararray and reinterpret it as constant.
+ */
+CBFresponsee
+CBF_stripfixvarnnz_maps(CBFdata *data, const double *lb, const double *ub, const double eps);
+
+CBFresponsee
+CBF_stripfixvarnnz_psdmaps(CBFdata *data, const double *lb, const double *ub, const double eps);
 
 
 /*

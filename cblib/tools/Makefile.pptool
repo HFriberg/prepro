@@ -1,0 +1,143 @@
+# Copyright (c) 2012 by Zuse-Institute Berlin and the Technical University of Denmark.
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#     1. Redistributions of source code must retain the above copyright
+#        notice, this list of conditions and the following disclaimer.
+#     2. Redistributions in binary form must reproduce the above copyright
+#        notice, this list of conditions and the following disclaimer in the
+#        documentation and/or other materials provided with the distribution.
+#     3. Neither the name of the copyright holders nor contributors may not
+#        be used to endorse or promote products derived from this software
+#        without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS NOR CONTRIBUTORS BE LIABLE
+# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+MOSEKHOME=/home/hap/mosekprj/dev/bld/gram/devel/default/minidist
+
+CC=g++
+#CCOPT=-g -m64 -std=c++98 -Wall -Wextra -pedantic -Wno-long-long -Wno-format -Wno-missing-field-initializers -Wno-unused-parameter
+CCOPT=-O3 -march=native -flto -fwhole-program -m64 -std=c++98 -Wall -Wextra -pedantic -Wno-long-long -Wno-format -Wno-missing-field-initializers -Wno-unused-parameter
+
+
+LD=g++
+#LDOPT=-g -m64 -std=c++98 -Wall -Wextra -pedantic -pthread -Wl,-rpath -Wl,${MOSEKHOME}/bin
+LDOPT=-O3 -march=native -flto -fwhole-program -m64 -std=c++98 -Wall -Wextra -pedantic -pthread -Wl,-rpath -Wl,${MOSEKHOME}/bin
+
+
+INCPATHS=-I. -I${MOSEKHOME}/h -I./zlib
+LIBPATHS=-L${MOSEKHOME}/bin -L./zlib
+LIBS=-lmosek64 -lz
+
+OBJECTS = pptool.o \
+          console.o \
+          cbf-format.o \
+          cbf-helper.o \
+          frontend-cbf.o \
+          backend-cbf.o \
+          solver-mosek.o \
+          transform-helper.o \
+          transform-analytics.o \
+          transform-graph.o \
+          transform-none.o \
+          transform-problem-pp.o \
+          transform-presolve.o \
+          transform-varstack-to-mapstack.o \
+          transform-rquad.o \
+          transform-placeholders.o \
+          transform-lindep-elimination-soc.o \
+          transform-probing.o
+
+ifeq ($(ZLIB),true)
+        CCOPT+=-DZLIB_SUPPORT
+        INCPATHS+=-I./zlib
+        LIBPATHS+=-L./zlib
+       	LIBS+=-lz
+        OBJECTS+=frontend-cbf-gz.o
+endif
+
+
+#############
+# TARGETS:
+#############
+pptool: $(OBJECTS)
+	$(LD) $(LDOPT) -o pptool $(OBJECTS) $(LIBPATHS) $(LIBS)
+
+pptool.o: pptool.cc
+	$(CC) -c $(INCPATHS)      $(CCOPT) -o pptool.o pptool.cc
+
+console.o: console.cc console.h
+	$(CC) -c $(INCPATHS)      $(CCOPT) -o console.o console.cc
+
+cbf-format.o: cbf-format.c cbf-format.h
+	$(CC) -c $(INCPATHS)      $(CCOPT) -o cbf-format.o cbf-format.c
+
+cbf-helper.o: cbf-helper.c cbf-helper.h
+	$(CC) -c $(INCPATHS)      $(CCOPT) -o cbf-helper.o cbf-helper.c
+
+frontend-cbf.o: frontend-cbf.c frontend-cbf.h
+	$(CC) -c $(INCPATHS)      $(CCOPT) -o frontend-cbf.o frontend-cbf.c
+
+frontend-cbf-gz.o: frontend-cbf-gz.c frontend-cbf-gz.h
+	$(CC) -c $(INCPATHS)      $(CCOPT) -o frontend-cbf-gz.o frontend-cbf-gz.c
+
+backend-cbf.o: backend-cbf.c backend-cbf.h
+	$(CC) -c $(INCPATHS)      $(CCOPT) -o backend-cbf.o backend-cbf.c
+
+solver-mosek.o: solver-mosek.cc solver-mosek.h solver-mosek-x.h
+	$(CC) -c $(INCPATHS)      $(CCOPT) -o solver-mosek.o solver-mosek.cc
+
+transform-helper.o: transform-helper.cc transform-helper.h
+	$(CC) -c $(INCPATHS)      $(CCOPT) -o transform-helper.o transform-helper.cc
+
+transform-analytics.o: transform-analytics.cc transform-analytics.h
+	$(CC) -c $(INCPATHS)      $(CCOPT) -o transform-analytics.o transform-analytics.cc
+
+transform-graph.o: transform-graph.cc transform-graph.h
+	$(CC) -c $(INCPATHS)      $(CCOPT) -o transform-graph.o transform-graph.cc
+
+transform-none.o: transform-none.c transform-none.h
+	$(CC) -c $(INCPATHS)      $(CCOPT) -o transform-none.o transform-none.c
+
+transform-problem-pp.o: transform-problem-pp.cc transform-problem-pp.h
+	$(CC) -c $(INCPATHS)      $(CCOPT) -o transform-problem-pp.o transform-problem-pp.cc
+
+transform-presolve.o: transform-presolve.cc transform-presolve.h
+	$(CC) -c $(INCPATHS)      $(CCOPT) -o transform-presolve.o transform-presolve.cc
+
+transform-varstack-to-mapstack.o: transform-varstack-to-mapstack.cc transform-varstack-to-mapstack.h
+	$(CC) -c $(INCPATHS)      $(CCOPT) -o transform-varstack-to-mapstack.o transform-varstack-to-mapstack.cc
+
+transform-rquad.o: transform-rquad.cc transform-rquad.h
+	$(CC) -c $(INCPATHS)      $(CCOPT) -o transform-rquad.o transform-rquad.cc
+
+transform-placeholders.o: transform-placeholders.cc transform-placeholders.h
+	$(CC) -c $(INCPATHS)      $(CCOPT) -o transform-placeholders.o transform-placeholders.cc
+
+transform-lindep-elimination-soc.o: transform-lindep-elimination-soc.cc transform-lindep-elimination-soc.h
+	$(CC) -c $(INCPATHS)      $(CCOPT) -o transform-lindep-elimination-soc.o transform-lindep-elimination-soc.cc
+
+transform-probing.o: transform-probing.cc transform-probing.h
+	$(CC) -c $(INCPATHS)      $(CCOPT) -o transform-probing.o transform-probing.cc
+
+
+#############
+# PHONY:
+#############
+.PHONY: all clean cleanall
+all: pptool
+	
+clean: 
+	rm -f $(OBJECTS)
+cleanall:
+	rm -f $(OBJECTS) pptool

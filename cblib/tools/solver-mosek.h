@@ -1,6 +1,6 @@
 // Copyright (c) 2012 by Zuse-Institute Berlin and the Technical University of Denmark.
 // All rights reserved.
-//
+// 
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
 //     1. Redistributions of source code must retain the above copyright
@@ -8,14 +8,14 @@
 //     2. Redistributions in binary form must reproduce the above copyright
 //        notice, this list of conditions and the following disclaimer in the
 //        documentation and/or other materials provided with the distribution.
-//     3. Neither the name of the copyright holders nor contributors may not
-//        be used to endorse or promote products derived from this software
+//     3. Neither the name of the copyright holders nor contributors may not 
+//        be used to endorse or promote products derived from this software 
 //        without specific prior written permission.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 // ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 // WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-// DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS NOR CONTRIBUTORS BE LIABLE
+// DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS NOR CONTRIBUTORS BE LIABLE 
 // FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 // (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 // LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
@@ -23,28 +23,12 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "transform-none.h"
-#include "cbf-format.h"
-#include "cbf-helper.h"
-#include <stddef.h>
+#ifndef CBF_SOLVER_MOSEK_H
+#define CBF_SOLVER_MOSEK_H
 
-static CBFresponsee
-  transform(CBFdata *data, CBFtransform_param &param, bool *changeflag);
+#include "solver.h"
 
+extern CBFsolver const solver_mosek;
 
-// -------------------------------------
-// Global variable
-// -------------------------------------
-
-CBFtransform const transform_none = { "none", transform };
-
-// -------------------------------------
-// Function definitions
-// -------------------------------------
-
-static CBFresponsee transform(CBFdata *data, CBFtransform_param &param, bool *changeflag)
-{
-  // Sort coordinates row major style
-  return CBF_coordinatesort_rowmajor_map(data);
-}
+#endif
 

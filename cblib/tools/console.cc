@@ -232,7 +232,7 @@ CBFresponsee processfile(const CBFfrontend *frontend, const CBFbackend *backend,
     param.init(&data);
 
     // Transform file
-    res = transform->transform(&data, param);
+    res = transform->transform(&data, param, NULL);
 
     if (res != CBF_RES_OK) {
       printf("Failed to transform file: %s\n", ifile);

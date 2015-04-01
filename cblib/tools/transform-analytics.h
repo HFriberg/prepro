@@ -23,28 +23,35 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "transform-none.h"
-#include "cbf-format.h"
-#include "cbf-helper.h"
-#include <stddef.h>
+#ifndef CBF_TRANSFORM_ANALYTICS_H
+#define CBF_TRANSFORM_ANALYTICS_H
 
-static CBFresponsee
-  transform(CBFdata *data, CBFtransform_param &param, bool *changeflag);
+#include "transform.h"
+#include <Eigen/Dense>
+#include <vector>
 
+CBFresponsee init_varbound(const CBFdata* data, Eigen::VectorXd& lb, Eigen::VectorXd& ub);
 
-// -------------------------------------
-// Global variable
-// -------------------------------------
+CBFresponsee update_varbound_full(const CBFdata* data,
+                                  char* intvars,
+                                  bool only_intvars,
+                                  Eigen::VectorXd& lb,
+                                  Eigen::VectorXd& ub,
+                                  std::vector<bool>* stronglb,
+                                  std::vector<bool>* strongub,
+                                  long long int* fixvar,
+                                  bool* infeas);
 
-CBFtransform const transform_none = { "none", transform };
+CBFresponsee update_varbound_fast(const CBFdata* data,
+                                  CBFtransform_param& param,
+                                  char* intvars,
+                                  Eigen::VectorXd& lb,
+                                  Eigen::VectorXd& ub,
+                                  std::vector<bool>* stronglb,
+                                  std::vector<bool>* strongub,
+                                  double* mapmaxviol,
+                                  long long int* fixvar,
+                                  bool* infeas,
+                                  bool* conestrictredund);
 
-// -------------------------------------
-// Function definitions
-// -------------------------------------
-
-static CBFresponsee transform(CBFdata *data, CBFtransform_param &param, bool *changeflag)
-{
-  // Sort coordinates row major style
-  return CBF_coordinatesort_rowmajor_map(data);
-}
-
+#endif

@@ -183,10 +183,11 @@ static CBFresponsee writeCON(FILE *pFile, const CBFdata data)
         res = CBF_RES_ERR;
 
     for (i=0; i<data.mapstacknum && res==CBF_RES_OK; ++i) {
-      CBF_conetostr(data.mapstackdomain[i], &conenam);
+      res = CBF_conetostr(data.mapstackdomain[i], &conenam);
 
-      if (fprintf(pFile, "%s %lli\n", conenam, data.mapstackdim[i]) <= 0)
-        res = CBF_RES_ERR;
+      if (res == CBF_RES_OK)
+        if (fprintf(pFile, "%s %lli\n", conenam, data.mapstackdim[i]) <= 0)
+          res = CBF_RES_ERR;
     }
 
     if (res == CBF_RES_OK)
@@ -210,10 +211,11 @@ static CBFresponsee writeVAR(FILE *pFile, const CBFdata data)
         res = CBF_RES_ERR;
 
     for (i=0; i<data.varstacknum && res==CBF_RES_OK; ++i) {
-      CBF_conetostr(data.varstackdomain[i], &conenam);
+      res = CBF_conetostr(data.varstackdomain[i], &conenam);
 
-      if (fprintf(pFile, "%s %lli\n", conenam, data.varstackdim[i]) <= 0)
-        res = CBF_RES_ERR;
+      if (res == CBF_RES_OK)
+        if (fprintf(pFile, "%s %lli\n", conenam, data.varstackdim[i]) <= 0)
+          res = CBF_RES_ERR;
     }
 
     if (res == CBF_RES_OK)

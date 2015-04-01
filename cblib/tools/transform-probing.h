@@ -23,28 +23,22 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "transform-none.h"
-#include "cbf-format.h"
-#include "cbf-helper.h"
-#include <stddef.h>
+#ifndef CBF_TRANSFORM_PROBING_H
+#define CBF_TRANSFORM_PROBING_H
 
-static CBFresponsee
-  transform(CBFdata *data, CBFtransform_param &param, bool *changeflag);
+#include "transform.h"
 
+#include <Eigen/Core>
 
-// -------------------------------------
-// Global variable
-// -------------------------------------
+#include <vector>
 
-CBFtransform const transform_none = { "none", transform };
+extern CBFtransform const transform_probing;
 
-// -------------------------------------
-// Function definitions
-// -------------------------------------
+void transform_probing_init(char *integerarray__,
+                            Eigen::VectorXd *__lb,
+                            Eigen::VectorXd *__ub,
+                            std::vector<bool> *stronglb,
+                            std::vector<bool> *strongub,
+                            bool *infeas__);
 
-static CBFresponsee transform(CBFdata *data, CBFtransform_param &param, bool *changeflag)
-{
-  // Sort coordinates row major style
-  return CBF_coordinatesort_rowmajor_map(data);
-}
-
+#endif

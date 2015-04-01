@@ -39,7 +39,7 @@ struct CBFtransform_flipsign {
 };
 
 static CBFresponsee
-  transform(CBFdata *data, CBFtransform_param param);
+  transform(CBFdata *data, CBFtransform_param &param);
 
 static CBFresponsee
   swap_obja_b(CBFdata *data, CBFtransform_flipsign *flipsign);
@@ -79,7 +79,7 @@ CBFtransform const transform_dual = { "dual", transform, };
 // Function definitions
 // -------------------------------------
 
-static CBFresponsee transform(CBFdata *data, CBFtransform_param param)
+static CBFresponsee transform(CBFdata *data, CBFtransform_param &param)
 {
   CBFresponsee res = CBF_RES_OK;
   CBFtransform_flipsign flipsign = {false};
