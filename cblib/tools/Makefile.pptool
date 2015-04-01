@@ -23,21 +23,19 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-MOSEKHOME=/home/hap/mosekprj/dev/bld/gram/devel/default/minidist
-
 CC=g++
 #CCOPT=-g -m64 -std=c++98 -Wall -Wextra -pedantic -Wno-long-long -Wno-format -Wno-missing-field-initializers -Wno-unused-parameter
 CCOPT=-O3 -march=native -flto -fwhole-program -m64 -std=c++98 -Wall -Wextra -pedantic -Wno-long-long -Wno-format -Wno-missing-field-initializers -Wno-unused-parameter
 
 
 LD=g++
-#LDOPT=-g -m64 -std=c++98 -Wall -Wextra -pedantic -pthread -Wl,-rpath -Wl,${MOSEKHOME}/bin
-LDOPT=-O3 -march=native -flto -fwhole-program -m64 -std=c++98 -Wall -Wextra -pedantic -pthread -Wl,-rpath -Wl,${MOSEKHOME}/bin
+#LDOPT=-g -m64 -std=c++98 -Wall -Wextra -pedantic -pthread -Wl,-rpath -Wl,./libs/MOSEK/bin
+LDOPT=-O3 -march=native -flto -fwhole-program -m64 -std=c++98 -Wall -Wextra -pedantic -pthread -Wl,-rpath -Wl,./libs/MOSEK/bin
 
 
-INCPATHS=-I. -I${MOSEKHOME}/h -I./zlib
-LIBPATHS=-L${MOSEKHOME}/bin -L./zlib
-LIBS=-lmosek64 -lz
+INCPATHS=-I. -I./libs/MOSEK/h -I./libs/EIGEN
+LIBPATHS=-L./libs/MOSEK/bin
+LIBS=-lmosek64
 
 OBJECTS = pptool.o \
           console.o \
@@ -58,12 +56,12 @@ OBJECTS = pptool.o \
           transform-lindep-elimination-soc.o \
           transform-probing.o
 
-ifeq ($(ZLIB),true)
-        CCOPT+=-DZLIB_SUPPORT
-        INCPATHS+=-I./zlib
-        LIBPATHS+=-L./zlib
-       	LIBS+=-lz
-        OBJECTS+=frontend-cbf-gz.o
+ifneq ("$(wildcard ./libs/ZLIB)","")
+	CCOPT+=-DZLIB_SUPPORT
+	INCPATHS+=-I./libs/ZLIB
+	LIBPATHS+=-L./libs/ZLIB
+	LIBS+=-lz
+	OBJECTS+=frontend-cbf-gz.o
 endif
 
 

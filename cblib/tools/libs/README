@@ -1,0 +1,29 @@
+This folder should contain three symbolic links
+EIGEN	
+MOSEK	
+ZLIB	(Optional for support of 'cbf.gz' formatted files)
+
+-------------
+EIGEN
+-------------
+Eigen is a C++ template library for linear algebra which can be downloaded at 
+http://eigen.tuxfamily.org. Please point the EIGEN symlink to the home of the 
+downloadable, having "Eigen" as subdir.
+
+
+-------------
+MOSEK
+-------------
+Mosek is a high performance software for large-scale LP, QP, SOCP, SDP and MIP 
+which can be downloaded at https://mosek.com/. Please point the MOSEK symlink 
+to the platform specific folder of the downloadable, having "h" and "bin" as 
+subdir.
+
+-------------
+ZLIB
+-------------
+Zlib is a Massively Spiffy Yet Delicately Unobtrusive Compression Library, 
+which can be downloaded at http://www.zlib.net/. Please point the ZLIB symlink
+to the home of the downloaded, containing "zlib.h" as file.
+
+
